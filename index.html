@@ -1,0 +1,875 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>MR.RAKIB | CYBER EXPERIENCE</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Courier New", monospace;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+
+.screen.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#intro, #verify, #loading, #finger {
+  color: #43ff9b;
+  background:
+    radial-gradient(ellipse at center, #08251a 0%, #020906 42%, #000 78%);
+}
+
+.grid-bg {
+  position: absolute;
+  inset: -50%;
+  opacity: .22;
+  background-image:
+    linear-gradient(#19ff8620 1px, transparent 1px),
+    linear-gradient(90deg, #19ff8620 1px, transparent 1px);
+  background-size: 35px 35px;
+  transform: perspective(500px) rotateX(55deg);
+  animation: gridMove 9s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes gridMove {
+  from { background-position: 0 0; }
+  to { background-position: 0 70px; }
+}
+
+.intro-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.developer {
+  font-size: clamp(42px, 12vw, 82px);
+  font-weight: 900;
+  letter-spacing: 5px;
+  text-shadow: 0 0 12px #32ff8b, 0 0 40px #00ff6680;
+  animation: glitch 1.5s infinite;
+}
+
+.mr {
+  font-size: clamp(17px, 5vw, 27px);
+  margin-top: 15px;
+  letter-spacing: 8px;
+  color: #c4ffdf;
+  text-shadow: 0 0 15px #35ff89;
+}
+
+.intro-line {
+  width: min(240px, 65vw);
+  height: 2px;
+  margin: 28px auto 0;
+  background: #39ff8a;
+  box-shadow: 0 0 15px #39ff8a;
+  animation: lineGrow 5s ease forwards;
+}
+
+@keyframes lineGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes glitch {
+  0%, 92%, 100% { transform: translate(0); }
+  93% { transform: translate(2px, -1px); }
+  95% { transform: translate(-2px, 1px); }
+  97% { transform: translate(1px, 0); }
+}
+
+.verify-content {
+  z-index: 2;
+  width: min(360px, 85%);
+  text-align: center;
+}
+
+.label {
+  font-size: clamp(17px, 5vw, 23px);
+  letter-spacing: 2px;
+  line-height: 1.6;
+  text-shadow: 0 0 15px #35ff8a;
+  margin-bottom: 28px;
+}
+
+.cyber-btn {
+  position: relative;
+  overflow: hidden;
+  min-width: 150px;
+  padding: 14px 35px;
+  color: #40ff98;
+  background: #06150d;
+  border: 1px solid #39ff8a;
+  box-shadow: 0 0 18px #20ff7720, inset 0 0 15px #20ff7710;
+  letter-spacing: 4px;
+  font-size: 16px;
+  transition: .25s;
+}
+
+.cyber-btn:active {
+  background: #39ff8a;
+  color: #001008;
+  box-shadow: 0 0 35px #39ff8a;
+}
+
+#loading {
+  flex-direction: column;
+  gap: 25px;
+}
+
+.load-frame {
+  width: min(330px, 82%);
+  padding: 6px;
+  height: 32px;
+  border: 1px solid #39ff8a;
+  box-shadow: 0 0 24px #39ff8a30;
+  transform: skewX(-12deg);
+}
+
+.load-fill {
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg, #39ff8a 0 8px, #0a7e45 8px 11px
+  );
+  box-shadow: 0 0 22px #39ff8a;
+}
+
+.load-frame.animate .load-fill {
+  animation: fillBar 5s linear forwards;
+}
+
+@keyframes fillBar {
+  to { width: 100%; }
+}
+
+/* FINGERPRINT SCREEN */
+#finger {
+  background: radial-gradient(circle, #061a11, #010402 55%, #000);
+}
+
+.finger-stage {
+  position: relative;
+  width: min(300px, 78vw);
+  height: min(350px, 65vh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scan-box {
+  position: absolute;
+  top: 12px;
+  width: 0;
+  height: 7px;
+  border: 1px solid #39ff8a;
+  background: #39ff8a;
+  box-shadow: 0 0 16px #39ff8a;
+  opacity: 0;
+}
+
+.scanning .scan-box {
+  opacity: 1;
+  animation: scanFill 3s linear forwards;
+}
+
+@keyframes scanFill {
+  from { width: 0; }
+  to { width: 90%; }
+}
+
+.fingerprint {
+  width: min(190px, 48vw);
+  height: min(230px, 35vh);
+  overflow: visible;
+  filter: drop-shadow(0 0 10px #39ff8a70);
+  transition: transform .65s ease, opacity .6s;
+}
+
+.fp-path {
+  fill: none;
+  stroke: #39ff8a;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 0;
+}
+
+.scanning .fp-path {
+  animation: fingerprintGlow .8s infinite alternate;
+}
+
+@keyframes fingerprintGlow {
+  from { stroke: #148c52; opacity: .55; }
+  to { stroke: #8dffc0; opacity: 1; }
+}
+
+.finger-stage.split .fingerprint.left {
+  transform: translateX(-100px) rotate(-8deg);
+  opacity: 0;
+}
+
+.finger-stage.split .fingerprint.right {
+  transform: translateX(100px) rotate(8deg);
+  opacity: 0;
+}
+
+.energy {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.energy span {
+  position: absolute;
+  width: 3px;
+  height: 0;
+  background: #7affb2;
+  box-shadow: 0 0 12px #39ff8a;
+  opacity: 0;
+}
+
+.scanning .energy span {
+  animation: energyIn .7s ease-out infinite alternate;
+}
+
+@keyframes energyIn {
+  0% { height: 0; opacity: .1; }
+  100% { height: 100px; opacity: 1; }
+}
+
+#confirm {
+  background: #000;
+  color: #39ff8a;
+  flex-direction: column;
+  text-align: center;
+  padding: 25px;
+}
+
+.confirm-text {
+  max-width: 600px;
+  font-size: clamp(20px, 5.5vw, 35px);
+  line-height: 1.7;
+  letter-spacing: 2px;
+  animation: confirmGlitch 1s steps(2) infinite;
+}
+
+@keyframes confirmGlitch {
+  0%, 100% { text-shadow: 0 0 15px #39ff8a; }
+  50% { text-shadow: 3px 0 #00aaff, -3px 0 #39ff8a; }
+}
+
+#white {
+  background: #fff;
+  transform: translateY(-100%);
+  transition: none;
+}
+
+#white.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#white.falling {
+  animation: whiteFall 6s cubic-bezier(.7,0,.2,1) forwards;
+}
+
+@keyframes whiteFall {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+#white.solid {
+  transform: translateY(0);
+}
+
+.drag-hint {
+  position: absolute;
+  top: 43%;
+  color: #777;
+  font-size: 20px;
+  letter-spacing: 12px;
+  animation: dragShow 3s ease forwards;
+  white-space: nowrap;
+}
+
+@keyframes dragShow {
+  0% { opacity: 0; transform: translateX(-60px); }
+  25%, 70% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(60px); }
+}
+
+/* SKELETON CREATURE */
+#creature {
+  background: #fff;
+  color: #111;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+#creatureCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#creatureHint {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: #888;
+  font-size: 10px;
+  letter-spacing: 3px;
+  pointer-events: none;
+  opacity: .7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-bg, .developer, .confirm-text { animation: none; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<section class="screen active" id="intro">
+  <div class="grid-bg"></div>
+  <div class="intro-content">
+    <div class="developer">DEVELOPER</div>
+    <div class="mr">MR.RAKIB</div>
+    <div class="intro-line"></div>
+  </div>
+</section>
+
+<!-- HUMAN CHECK -->
+<section class="screen" id="verify">
+  <div class="grid-bg"></div>
+  <div class="verify-content">
+    <div class="label">CHECK YOU ARE HUMAN</div>
+    <button class="cyber-btn" id="okBtn">OK</button>
+  </div>
+</section>
+
+<!-- LOADING -->
+<section class="screen" id="loading">
+  <div class="load-frame" id="loadFrame">
+    <div class="load-fill"></div>
+  </div>
+</section>
+
+<!-- FINGERPRINT -->
+<section class="screen" id="finger">
+  <div class="grid-bg"></div>
+
+  <div class="finger-stage" id="fingerStage">
+    <div class="scan-box"></div>
+
+    <div class="energy" id="energy"></div>
+
+    <svg class="fingerprint left" viewBox="0 0 160 200"
+         xmlns="http://www.w3.org/2000/svg">
+      <g class="fp-path">
+        <path d="M80 20 C45 20 25 48 25 78"/>
+        <path d="M80 34 C52 34 38 53 38 80"/>
+        <path d="M80 48 C62 48 51 61 51 82"/>
+        <path d="M80 62 C71 62 65 71 65 84"/>
+        <path d="M80 20 C115 20 135 48 135 78"/>
+        <path d="M80 34 C108 34 122 53 122 80"/>
+        <path d="M80 48 C98 48 109 61 109 82"/>
+        <path d="M80 62 C89 62 95 71 95 84"/>
+        <path d="M25 90 C25 142 45 170 80 183"/>
+        <path d="M38 91 C38 131 52 154 80 165"/>
+        <path d="M51 94 C51 122 62 142 80 149"/>
+        <path d="M65 96 C65 115 71 127 80 132"/>
+        <path d="M135 90 C135 142 115 170 80 183"/>
+        <path d="M122 91 C122 131 108 154 80 165"/>
+        <path d="M109 94 C109 122 98 142 80 149"/>
+        <path d="M95 96 C95 115 89 127 80 132"/>
+      </g>
+    </svg>
+
+    <svg class="fingerprint right" viewBox="0 0 160 200"
+         xmlns="http://www.w3.org/2000/svg"
+         style="position:absolute; transform:translateX(0)">
+      <g class="fp-path">
+        <path d="M80 20 C45 20 25 48 25 78"/>
+        <path d="M80 34 C52 34 38 53 38 80"/>
+        <path d="M80 48 C62 48 51 61 51 82"/>
+        <path d="M80 62 C71 62 65 71 65 84"/>
+        <path d="M80 20 C115 20 135 48 135 78"/>
+        <path d="M80 34 C108 34 122 53 122 80"/>
+        <path d="M80 48 C98 48 109 61 109 82"/>
+        <path d="M80 62 C89 62 95 71 95 84"/>
+        <path d="M25 90 C25 142 45 170 80 183"/>
+        <path d="M38 91 C38 131 52 154 80 165"/>
+        <path d="M51 94 C51 122 62 142 80 149"/>
+        <path d="M65 96 C65 115 71 127 80 132"/>
+        <path d="M135 90 C135 142 115 170 80 183"/>
+        <path d="M122 91 C122 131 108 154 80 165"/>
+        <path d="M109 94 C109 122 98 142 80 149"/>
+        <path d="M95 96 C95 115 89 127 80 132"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- CONFIRMATION -->
+<section class="screen" id="confirm">
+  <div class="confirm-text">
+    YOU ARE HUMAN<br>
+    NOT ROBOT<br>
+    CONFIRM
+  </div>
+  <button class="cyber-btn" id="nextBtn" style="margin-top:35px">
+    NEXT
+  </button>
+</section>
+
+<!-- WHITE TRANSITION -->
+<section class="screen" id="white"></section>
+
+<!-- CREATURE -->
+<section class="screen" id="creature">
+  <canvas id="creatureCanvas"></canvas>
+  <div id="creatureHint">TOUCH & DRAG</div>
+</section>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  const screens = [
+    "intro", "verify", "loading", "finger",
+    "confirm", "white", "creature"
+  ];
+
+  let current = "intro";
+  let timers = [];
+  let introTimer = null;
+  let fingerprintTimer = null;
+  let fingerDown = false;
+  let fingerStarted = 0;
+  let fingerprintUnlocked = false;
+
+  function later(fn, ms) {
+    const id = setTimeout(fn, ms);
+    timers.push(id);
+    return id;
+  }
+
+  function show(id) {
+    current = id;
+    screens.forEach(name => {
+      $(name).classList.toggle("active", name === id);
+    });
+  }
+
+  // Intro stays for 5 seconds.
+  introTimer = later(() => {
+    show("verify");
+  }, 5000);
+
+  // OK: five-second loading animation.
+  $("okBtn").addEventListener("click", () => {
+    if (current !== "verify") return;
+
+    show("loading");
+
+    // Restart the CSS animation every time.
+    $("loadFrame").classList.remove("animate");
+    void $("loadFrame").offsetWidth;
+    $("loadFrame").classList.add("animate");
+
+    later(() => {
+      show("finger");
+    }, 5000);
+  });
+
+  // Decorative energy lines around the fingerprint.
+  for (let i = 0; i < 18; i++) {
+    const line = document.createElement("span");
+    const angle = (i / 18) * Math.PI * 2;
+    line.style.left = (50 + Math.cos(angle) * 42) + "%";
+    line.style.top = (50 + Math.sin(angle) * 40) + "%";
+    line.style.transform = `rotate(${i * 20}deg)`;
+    line.style.animationDelay = (i * 0.035) + "s";
+    $("energy").appendChild(line);
+  }
+
+  const stage = $("fingerStage");
+
+  function startFingerprint(e) {
+    if (current !== "finger" || fingerprintUnlocked) return;
+
+    fingerDown = true;
+    fingerStarted = Date.now();
+    stage.classList.add("scanning");
+
+    if (fingerprintTimer) clearTimeout(fingerprintTimer);
+
+    fingerprintTimer = setTimeout(() => {
+      if (!fingerDown || current !== "finger") return;
+
+      fingerprintUnlocked = true;
+      fingerDown = false;
+
+      stage.classList.remove("scanning");
+      stage.classList.add("split");
+
+      later(() => {
+        show("confirm");
+      }, 700);
+    }, 3000);
+  }
+
+  function stopFingerprint() {
+    if (fingerprintUnlocked) return;
+
+    fingerDown = false;
+    stage.classList.remove("scanning");
+
+    if (fingerprintTimer) {
+      clearTimeout(fingerprintTimer);
+      fingerprintTimer = null;
+    }
+  }
+
+  stage.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    startFingerprint(e);
+  });
+
+  window.addEventListener("pointerup", stopFingerprint);
+  window.addEventListener("pointercancel", stopFingerprint);
+
+  $("nextBtn").addEventListener("click", () => {
+    if (current !== "confirm") return;
+
+    const white = $("white");
+    show("white");
+
+    white.classList.remove("falling", "solid");
+    void white.offsetWidth;
+    white.classList.add("falling");
+
+    later(() => {
+      white.classList.remove("falling");
+      white.classList.add("solid");
+      white.innerHTML = '<div class="drag-hint">DRAG</div>';
+    }, 6000);
+
+    later(() => {
+      white.innerHTML = "";
+      show("creature");
+      initCreature();
+    }, 9000);
+  });
+
+  // -------------------------------------------------
+  // Procedural 2D skeleton serpent.
+  // It assembles around the initial touch point.
+  // Dragging moves the head; releasing dissolves it.
+  // -------------------------------------------------
+
+  const canvas = $("creatureCanvas");
+  const ctx = canvas.getContext("2d");
+
+  let W = 0, H = 0, dpr = 1;
+  let animationFrame = null;
+  let creatureReady = false;
+  let activeTouch = false;
+  let target = { x: 0, y: 0 };
+  let head = { x: 0, y: 0 };
+  let previousHead = { x: 0, y: 0 };
+  let heading = 0;
+  let time = 0;
+  let particles = [];
+  let segments = [];
+  let lastBuildTouch = null;
+
+  const SEGMENT_COUNT = 30;
+  const SEGMENT_GAP = 8.5;
+
+  function resizeCanvas() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (!creatureReady) {
+      head.x = W / 2;
+      head.y = H / 2;
+      target.x = head.x;
+      target.y = head.y;
+      previousHead = { ...head };
+    }
+  }
+
+  function random(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function createParticles(x, y) {
+    particles = [];
+
+    // Loose fragments converge toward the touch point.
+    for (let i = 0; i < 180; i++) {
+      const angle = random(0, Math.PI * 2);
+      const distance = random(
+        Math.min(W, H) * 0.28,
+        Math.max(W, H) * 0.8
+      );
+
+      particles.push({
+        x: x + Math.cos(angle) * distance,
+        y: y + Math.sin(angle) * distance,
+        tx: x + random(-SEGMENT_COUNT * SEGMENT_GAP,
+                       SEGMENT_COUNT * SEGMENT_GAP),
+        ty: y + random(-80, 80),
+        size: random(1.5, 3.5),
+        speed: random(0.035, 0.09),
+        phase: random(0, 7)
+      });
+    }
+
+    // Create a body trail from the head.
+    segments = [];
+
+    for (let i = 0; i < SEGMENT_COUNT; i++) {
+      segments.push({
+        x: x - i * SEGMENT_GAP,
+        y: y,
+        angle: 0
+      });
+    }
+
+    head = { x, y };
+    previousHead = { ...head };
+    target = { x, y };
+    heading = 0;
+    creatureReady = true;
+  }
+
+  function dissolveCreature() {
+    activeTouch = false;
+    creatureReady = false;
+    lastBuildTouch = null;
+
+    // Turn the skeleton into drifting pieces.
+    for (const p of particles) {
+      p.x = segments[
+        Math.floor(Math.random() * segments.length)
+      ].x + random(-15, 15);
+
+      p.y = segments[
+        Math.floor(Math.random() * segments.length)
+      ].y + random(-15, 15);
+
+      p.tx = random(-30, W + 30);
+      p.ty = random(-30, H + 30);
+      p.speed = random(0.025, 0.07);
+    }
+  }
+
+  function pointerPosition(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+  }
+
+  function onCreatureDown(e) {
+    if (current !== "creature") return;
+
+    e.preventDefault();
+
+    activeTouch = true;
+    target = pointerPosition(e);
+    lastBuildTouch = { ...target };
+
+    createParticles(target.x, target.y);
+
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+  }
+
+  function onCreatureMove(e) {
+    if (!activeTouch || current !== "creature") return;
+
+    e.preventDefault();
+    target = pointerPosition(e);
+  }
+
+  function onCreatureUp() {
+    if (!activeTouch) return;
+    dissolveCreature();
+  }
+
+  canvas.addEventListener("pointerdown", onCreatureDown);
+  canvas.addEventListener("pointermove", onCreatureMove);
+  canvas.addEventListener("pointerup", onCreatureUp);
+  canvas.addEventListener("pointercancel", onCreatureUp);
+  canvas.addEventListener("lostpointercapture", onCreatureUp);
+
+  function drawParticle(p, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "#777";
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+    ctx.globalAlpha = 1;
+  }
+
+  function updateParticles() {
+    if (activeTouch && creatureReady) {
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+
+        // Fragments spiral into the newly created creature.
+        const seg = segments[
+          Math.floor((i / particles.length) * segments.length)
+        ];
+
+        p.tx = seg.x + Math.cos(time * 2 + p.phase) * 12;
+        p.ty = seg.y + Math.sin(time * 2 + p.phase) * 12;
+
+        p.x += (p.tx - p.x) * p.speed;
+        p.y += (p.ty - p.y) * p.speed;
+        drawParticle(p, 0.8);
+      }
+    } else {
+      for (const p of particles) {
+        p.x += (p.tx - p.x) * p.speed;
+        p.y += (p.ty - p.y) * p.speed;
+
+        p.x += Math.sin(time + p.phase) * 0.18;
+        p.y += Math.cos(time + p.phase) * 0.18;
+
+        drawParticle(p, 0.7);
+      }
+    }
+  }
+
+  function updateSegments() {
+    if (!creatureReady || !activeTouch) return;
+
+    // Smooth head tracking with a speed limit.
+    const dx = target.x - head.x;
+    const dy = target.y - head.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance > 0.01) {
+      const maxStep = 5.2;
+      const step = Math.min(distance, maxStep);
+
+      head.x += (dx / distance) * step;
+      head.y += (dy / distance) * step;
+
+      heading = Math.atan2(dy, dx);
+    }
+
+    segments[0].x = head.x;
+    segments[0].y = head.y;
+    segments[0].angle = heading;
+
+    // Each segment follows the previous segment.
+    for (let i = 1; i < segments.length; i++) {
+      const a = segments[i - 1];
+      const b = segments[i];
+
+      const bx = a.x - b.x;
+      const by = a.y - b.y;
+      const d = Math.hypot(bx, by) || 1;
+
+      const wiggle = Math.sin(time * 5 - i * 0.55) * 1.7;
+      const wantedAngle = Math.atan2(by, bx) + wiggle * 0.025;
+
+      b.x = a.x - Math.cos(wantedAngle) * SEGMENT_GAP;
+      b.y = a.y - Math.sin(wantedAngle) * SEGMENT_GAP;
+      b.angle = Math.atan2(a.y - b.y, a.x - b.x);
+    }
+  }
+
+  function drawSkeleton() {
+    if (!creatureReady) return;
+
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Thin connected spinal structure.
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+
+    segments.forEach((s, i) => {
+      if (i === 0) ctx.moveTo(s.x, s.y);
+      else ctx.lineTo(s.x, s.y);
+    });
+
+    ctx.stroke();
+
+    segments.forEach((s, i) => {
+      const size = 4.2 - (i / segments.length) * 2;
+      const pulse = Math.sin(time * 9 - i * 0.8) * 1.5;
+
+      // Rib cage on alternating sides.
+      if (i > 1 && i < segments.length - 2) {
+        const side = 1;
+        const perp = s.angle + Math.PI / 2;
+    
