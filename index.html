@@ -872,4 +872,150 @@ button {
       if (i > 1 && i < segments.length - 2) {
         const side = 1;
         const perp = s.angle + Math.PI / 2;
+        
+      const ribLength = 9 + Math.sin(time * 8 - i) * 1.8;
+
+      for (const direction of [-1, 1]) {
+        const px = s.x + Math.cos(perp) * ribLength * direction;
+        const py = s.y + Math.sin(perp) * ribLength * direction;
+
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(px, py);
+        ctx.stroke();
+
+        // Moving articulated legs
+        const legAngle =
+          perp + direction * (
+            0.8 + Math.sin(time * 10 + i) * 0.2
+          );
+
+        const footX = px + Math.cos(legAngle) * (7 + pulse);
+        const footY = py + Math.sin(legAngle) * (7 + pulse);
+
+        ctx.strokeStyle = "#777";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(footX, footY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(footX, footY, 1.3, 0, Math.PI * 2);
+        ctx.fillStyle = "#555";
+        ctx.fill();
+      }
+    }
+
+    // Vertebrae
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, Math.max(1.5, size), 0, Math.PI * 2);
+    ctx.fillStyle = i === 0 ? "#111" : "#777";
+    ctx.fill();
+
+    ctx.strokeStyle = "#333";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Skull-like head
+    if (i === 0) {
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(heading);
+
+      ctx.fillStyle = "#222";
+      ctx.strokeStyle = "#111";
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.ellipse(3, 0, 8, 5.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Jaw
+      ctx.beginPath();
+      ctx.moveTo(3, 3);
+      ctx.lineTo(10, 7);
+      ctx.lineTo(13, 4);
+      ctx.stroke();
+
+      // Neon eye
+      ctx.fillStyle = "#39ff88";
+      ctx.shadowColor = "#39ff88";
+      ctx.shadowBlur = 7;
+
+      ctx.beginPath();
+      ctx.arc(6, -2, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+  });
+
+  ctx.restore();
+}
+
+function drawIdleBackground() {
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, W, H);
+}
+
+function animateCreature() {
+  if (current !== "creature") {
+    animationFrame = null;
+    return;
+  }
+
+  animationFrame = requestAnimationFrame(animateCreature);
+
+  time += 0.016;
+
+  drawIdleBackground();
+  updateSegments();
+  updateParticles();
+  drawSkeleton();
+}
+
+function initCreature() {
+  if (animationFrame !== null) {
+    cancelAnimationFrame(animationFrame);
+    animationFrame = null;
+  }
+
+  resizeCanvas();
+
+  creatureReady = false;
+  activeTouch = false;
+  particles = [];
+  segments = [];
+
+  if (!animationFrame) {
+    animateCreature();
+  }
+}
+
+window.addEventListener("resize", resizeCanvas, {
+  passive: true
+});
+
+window.addEventListener("pagehide", () => {
+  timers.forEach(clearTimeout);
+
+  if (fingerprintTimer) {
+    clearTimeout(fingerprintTimer);
+  }
+
+  if (animationFrame !== null) {
+    cancelAnimationFrame(animationFrame);
+  }
+});
+})();
+</script>
+</body>
+</html>
+
+
+    
     
